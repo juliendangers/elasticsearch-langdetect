@@ -179,6 +179,7 @@ public class Detector extends AbstractLifecycleComponent<Detector> {
     }
 
     private final static Pattern word = Pattern.compile("[\\P{IsWord}]", Pattern.UNICODE_CHARACTER_CLASS);
+    private final static Pattern urlPattern = Pattern.compile("^(https?|ftp)://[^\\s/$.?#].[^\\s]*$",Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
 
     /**
      * Detect language of the target text and return the language name which has
@@ -189,7 +190,7 @@ public class Detector extends AbstractLifecycleComponent<Detector> {
      */
     public String detect(String text) throws LanguageDetectionException {
         List<Language> probabilities =
-                detectAll(text.replaceAll(word.pattern(), " "));
+                detectAll(text.replaceAll(word.pattern(), " ").replaceAll(urlPattern.pattern(), " "));
         //detectAll(normalize(text));
         if (probabilities.size() > 0) {
             return probabilities.get(0).getLanguage();
@@ -198,7 +199,7 @@ public class Detector extends AbstractLifecycleComponent<Detector> {
     }
 
     public List<Language> detectAll(String text) throws LanguageDetectionException {
-        return sortProbability(detectBlock(/*normalize(text)*/text.replaceAll(word.pattern(), " ")));
+        return sortProbability(detectBlock(/*normalize(text)*/text.replaceAll(word.pattern(), " ").replaceAll(urlPattern.pattern(), " ")));
     }
 
     private double[] detectBlock(String text) throws LanguageDetectionException {
